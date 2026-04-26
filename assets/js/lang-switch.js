@@ -3,11 +3,15 @@
   var userLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
   var isKorean = userLang.startsWith('ko');
   var path = window.location.pathname;
-  var isKoPage = path.startsWith('/ko') || path.includes('/ko/');
+  var isKoPage = path.includes('/ko/') || path.endsWith('/ko');
 
   if (isKorean && !isKoPage && !localStorage.getItem('langChosen')) {
-    var koPath = '/ko' + (path === '/' ? '/' : path);
-    window.location.replace(koPath);
+    // Use relative redirect: insert 'ko/' before the filename
+    // Works correctly on both custom domains and GitHub Pages subdirectory deployments
+    var basePath = path.substring(0, path.lastIndexOf('/') + 1); // e.g. '/fridoumi-web/'
+    var filename = path.split('/').pop();                          // e.g. 'index.html'
+    var koUrl = basePath + 'ko/' + (filename || 'index.html');
+    window.location.replace(koUrl);
   }
 
   // Highlight active language in switcher
